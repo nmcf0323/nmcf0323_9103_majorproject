@@ -50,7 +50,7 @@
   
     // We used rgb values instead for the secondary building to allow for a semi-transparent effect
     // I did not extend the color changing to this building as the effect is minimal due to its transparency
-      building2Colors = [
+      buildingBColors = [
         color(48, 71, 84, 63.5),
         color(118, 46, 89, 63.5),
         color(111, 56, 49, 63.5)
@@ -110,7 +110,7 @@
         {x: 1240, y: 1015}, {x: 0, y: 1015},
       ];
 
-      building2Points = [
+      buildingBPoints = [
         {x: 1905, y: 1015}, {x: 2038, y: 721}, {x: 2131, y: 855}, {x: 2189, y: 735},
         {x: 2205, y: 657}, {x: 2227, y: 707}, {x: 2401, y: 1015},
       ];
@@ -188,21 +188,20 @@ function draw() {
   drawRiver(); 
   drawReflection();
   drawBuilding();
-  drawBuilding2();
+  drawBuildingB();
 }
   // We first draw the sky. This requires it's own scaling and coloring methods due to the complexity of the diagonal lines
   function drawSky() {
     let scaleX = width / originalWidth;
     let scaleY = height / originalHeight;
- 
-    // I then use the p5.js system variable mouseX to track the mouse's x-position
-    // I normalise the mouse position to a range between 0 and 1 based on the browser width by dividing mouseX by width
-    let mouseXRatio = mouseX / width;
     
-    
-    // I then loop through each shape and clear the array to store the changing sky color
     for (let i = 0; i < skyAngles.length; i++) {
       let shape = skyAngles[i];
+ 
+  // I then use the p5.js system variable mouseX to track the mouse's x-position
+  // I normalise the mouse position to a range between 0 and 1 based on the browser width by dividing mouseX by width
+  // and clear the array to store the changing sky color
+    let mouseXRatio = mouseX / width;      
       changingSkyColor = [];
       
     // I then loop through the color arrays and use lerpColor to interpolate between these arrays based on the mouse's x-position
@@ -230,7 +229,6 @@ function draw() {
     function drawRiver() {
       let scaledRiverPoints = scalePoints(riverPoints);
       
-
       let minY = Math.min(...scaledRiverPoints.map(p => p.y));
       let maxY = Math.max(...scaledRiverPoints.map(p => p.y));
       let step = 4;
@@ -248,7 +246,6 @@ function draw() {
       }
     }
 
-
     function drawBuilding() {
       let scaledBuildingPoints = scalePoints(buildingPoints);
 
@@ -257,7 +254,6 @@ function draw() {
       let step = 3;
       
       let mouseXRatio = mouseX / width;
-
       changingBuildingColor = [];
       
       for (let j = 0; j < buildingColors.length; j++) {
@@ -286,8 +282,7 @@ function draw() {
         let step = 4;
 
         let mouseXRatio = mouseX / width;
-
-      changingBuildingColor = [];
+        changingBuildingColor = [];
       
       for (let j = 0; j < buildingColors.length; j++) {
         let interpolatedBuildingColor = lerpColor(buildingColors[j], buildingColors2[j], mouseXRatio);
@@ -307,10 +302,8 @@ function draw() {
       }
     }
 
-
-
-    function drawBuilding2() {
-      let scaledBuildingPoints = scalePoints(building2Points);
+    function drawBuildingB() {
+      let scaledBuildingPoints = scalePoints(buildingBPoints);
 
       let minX = Math.min(...scaledBuildingPoints.map(p => p.x));
       let maxX = Math.max(...scaledBuildingPoints.map(p => p.x));
@@ -318,13 +311,13 @@ function draw() {
 
       for (let x = minX; x <= maxX; x += step) {
         let inter = map(x, minX, maxX, 0, 1);
-        let building2StrokeColors;
+        let buildingBStrokeColors;
         if (inter < 0.5) {
-          building2StrokeColors = lerpColor(building2Colors[0], building2Colors[1] , inter * 2);
+          buildingBStrokeColors = lerpColor(buildingBColors[0], buildingBColors[1] , inter * 2);
         } else {
-          building2StrokeColors = lerpColor(building2Colors[1], building2Colors[2], (inter - 0.5) * 2);
+          buildingBStrokeColors = lerpColor(buildingBColors[1], buildingBColors[2], (inter - 0.5) * 2);
         }
-        fillShapeWithVerticalLines(scaledBuildingPoints, building2StrokeColors, x);
+        fillShapeWithVerticalLines(scaledBuildingPoints, buildingBStrokeColors, x);
       }
     }
 
