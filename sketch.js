@@ -24,16 +24,37 @@
         color("#3459a0")  
       ];
       skyColors2 = [
-        color("cce3ff"),
-        color("#93c4ff"), 
-        color("#61a8ff"),
-        color("#488de4"),
-        color("#3459a0")  
+        color("c3c0c7"),
+        color("#c6bac8"), 
+        color("#a6a7bb"),
+        color("#aec0b4"),
+        color("#8eb3cd")  
       ];
-
     // I initialise an empty changing sky color array through which the two sky color arrays will later be interpolated 
     // so that they transition between one another based on the mouse x-position
       changingSkyColor = [];
+
+    // Building colors will be implemented in the primary building and it's reflection in the river
+      buildingColors = [
+        color('#304754'), 
+        color('#762E59'), 
+        color('#6F3831')
+    ];
+      buildingColors2 = [
+        color('#849396'), 
+        color('#b9a4a1'), 
+        color('#878daf')
+      ];
+      // I then used the same logic and initialised an empty changing building color array
+      changingBuildingColor = [];
+  
+    // We used rgb values instead for the secondary building to allow for a semi-transparent effect
+    // I did not extend the color changing to this building as the effect is minimal due to its transparency
+      building2Colors = [
+        color(48, 71, 84, 63.5),
+        color(118, 46, 89, 63.5),
+        color(111, 56, 49, 63.5)
+      ];
 
   // 2B. SHAPE DEFINITIONS
     // We then define the coordinates that outline each section in the artwork so that these created shapes can be filled with lines
@@ -75,13 +96,72 @@
         {points: skyPointsI, angle: PI / 6}
       ];
 
+    // We then define the buildings and river coordinates
+      buildingPoints = [
+        {x: 0, y: 1015},
+        {x: 0, y: 897}, 
+        {x: 64, y: 897}, {x: 64, y: 812}, {x: 143, y: 738}, {x: 223, y: 762}, {x: 263, y: 655},
+        {x: 302, y: 759}, {x: 345, y: 728}, {x: 345, y: 269}, {x: 372, y: 300}, {x: 372, y: 106},
+        {x: 401, y: 43}, {x: 467, y: 321}, {x: 467, y: 643}, {x: 535, y: 588}, {x: 535, y: 580},
+        {x: 550, y: 515}, {x: 565, y: 540}, {x: 565, y: 588},  {x: 636, y: 648}, {x: 636, y: 725},
+        {x: 728, y: 725}, {x: 798, y: 757}, {x: 834, y: 757}, {x: 846, y: 706}, {x: 856, y: 757},
+        {x: 938, y: 810}, {x: 938, y: 850}, {x: 1128, y: 879},
+        {x: 1240, y: 950}, 
+        {x: 1240, y: 1015}, {x: 0, y: 1015},
+      ];
+
+      building2Points = [
+        {x: 1905, y: 1015}, {x: 2038, y: 721}, {x: 2131, y: 855}, {x: 2189, y: 735},
+        {x: 2205, y: 657}, {x: 2227, y: 707}, {x: 2401, y: 1015},
+      ];
+
       riverPoints = [
         {x: 0, y: 1015},
         {x: 2480, y: 1015},
         {x: 2480, y: 1758},
         {x: 0, y: 1758}
       ];
-    }
+
+    // Since the reflection does not require variation in their filled lines, we can define its segments collectively
+    reflectionSegments = [
+      [
+        {x: 128, y: 1015}, {x: 372, y: 1096}, {x: 354, y: 1136},
+        {x: 379, y: 1153}, {x: 371, y: 1183}, {x: 389, y: 1203},
+        {x: 373, y: 1243}, {x: 400, y: 1247}, {x: 507, y: 1243},
+        {x: 547, y: 1193}, {x: 505, y: 1176}, {x: 543, y: 1156},
+        {x: 496, y: 1140}, {x: 550, y: 1053}, {x: 547, y: 1050},
+        {x: 948, y: 1046}, {x: 1228, y: 1012}, {x: 128, y: 1015}
+      ],
+      [
+        {x: 428, y: 1258}, {x: 366, y: 1264}, {x: 381, y: 1277},
+        {x: 365, y: 1284}, {x: 383, y: 1300}, {x: 353, y: 1321},
+        {x: 445, y: 1341}, {x: 515, y: 1336}, {x: 508, y: 1303},
+        {x: 524, y: 1283}, {x: 428, y: 1258}
+      ],
+      [
+        {x: 398, y: 1348}, {x: 497, y: 1362}, {x: 506, y: 1406},
+        {x: 455, y: 1439}, {x: 377, y: 1430}, {x: 362, y: 1401},
+        {x: 398, y: 1358}
+      ],
+      [
+        {x: 412, y: 1469}, {x: 360, y: 1474}, {x: 395, y: 1508},      
+        {x: 369, y: 1520}, {x: 369, y: 1551}, {x: 485, y: 1555},
+        {x: 457, y: 1525}, {x: 487, y: 1519}, {x: 488, y: 1516},
+        {x: 494, y: 1502}, {x: 412, y: 1469}
+      ],
+      [
+        {x: 454, y: 1586}, {x: 384, y: 1594}, {x: 380, y: 1610},
+        {x: 379, y: 1629}, {x: 420, y: 1654}, {x: 483, y: 1652},
+        {x: 477, y: 1612}, {x: 493, y: 1602}
+      ],
+      [
+        {x: 452, y: 1694}, {x: 407, y: 1700}, {x: 394, y: 1734},
+        {x: 400, y: 1751}, {x: 497, y: 1748}, {x: 494, y: 1734},
+        {x: 453, y: 1694}
+      ]
+    ];
+
+  }
 
 // 3. SCALING AND ROTATION
   // We then implement the following functions that will be utilised later in the code 
@@ -106,6 +186,9 @@ function draw() {
   background('#FFFFFF');
   drawSky();
   drawRiver(); 
+  drawReflection();
+  drawBuilding();
+  drawBuilding2();
 }
   // We first draw the sky. This requires it's own scaling and coloring methods due to the complexity of the diagonal lines
   function drawSky() {
@@ -126,8 +209,8 @@ function draw() {
     // This means that as the mouse moves along the x-axis, skyColor[0] will transition to skyColor2[0], skyColor[1] will transition to skyColor2[1] and so on
     // I then push the interpolated colors into the previously initialised changing sky color array to be called upon when filling the sky shapes with lines
       for (let j = 0; j < skyColors.length; j++) {
-        let interpolatedColor = lerpColor(skyColors[j], skyColors2[j], mouseXRatio);
-        changingSkyColor.push(interpolatedColor);
+        let interpolatedSkyColor = lerpColor(skyColors[j], skyColors2[j], mouseXRatio);
+        changingSkyColor.push(interpolatedSkyColor);
       }
       
       noStroke();
@@ -164,6 +247,87 @@ function draw() {
         fillShapeWithHorizontalLines(scaledRiverPoints, riverStrokeColor, y);
       }
     }
+
+
+    function drawBuilding() {
+      let scaledBuildingPoints = scalePoints(buildingPoints);
+
+      let minX = Math.min(...scaledBuildingPoints.map(p => p.x));
+      let maxX = Math.max(...scaledBuildingPoints.map(p => p.x));
+      let step = 3;
+      
+      let mouseXRatio = mouseX / width;
+
+      changingBuildingColor = [];
+      
+      for (let j = 0; j < buildingColors.length; j++) {
+        let interpolatedBuildingColor = lerpColor(buildingColors[j], buildingColors2[j], mouseXRatio);
+        changingBuildingColor.push(interpolatedBuildingColor);
+      }
+
+      for (let x = minX; x <= maxX; x += step) {
+        let inter = map(x, minX, maxX, 0, 1);
+        let buildingStrokeColor;
+        if (inter < 0.5) {
+          buildingStrokeColor = lerpColor(changingBuildingColor[0], changingBuildingColor[1], inter * 2);
+        } else {
+          buildingStrokeColor = lerpColor(changingBuildingColor[1], changingBuildingColor[2], (inter - 0.5) * 2);
+        }
+        fillShapeWithVerticalLines(scaledBuildingPoints, buildingStrokeColor, x);
+      }
+    }
+
+    function drawReflection() {
+      for (let reflectionPoints of reflectionSegments) {
+        let scaledReflectionPoints = scalePoints(reflectionPoints);
+
+        let minY = Math.min(...scaledReflectionPoints.map(p => p.y));
+        let maxY = Math.max(...scaledReflectionPoints.map(p => p.y));
+        let step = 4;
+
+        let mouseXRatio = mouseX / width;
+
+      changingBuildingColor = [];
+      
+      for (let j = 0; j < buildingColors.length; j++) {
+        let interpolatedBuildingColor = lerpColor(buildingColors[j], buildingColors2[j], mouseXRatio);
+        changingBuildingColor.push(interpolatedBuildingColor);
+      }
+
+        for (let y = minY; y <= maxY; y += step) {
+          let inter = map(y, minY, maxY, 0, 1);
+          let reflectionStrokeColor;
+          if (inter < 0.5) {
+            reflectionStrokeColor = lerpColor(changingBuildingColor[0], changingBuildingColor[1], inter * 2);
+          } else {
+            reflectionStrokeColor = lerpColor(changingBuildingColor[1], changingBuildingColor[2], (inter - 0.5) * 2);
+          }
+          fillShapeWithHorizontalLines(scaledReflectionPoints, reflectionStrokeColor, y);
+        }
+      }
+    }
+
+
+
+    function drawBuilding2() {
+      let scaledBuildingPoints = scalePoints(building2Points);
+
+      let minX = Math.min(...scaledBuildingPoints.map(p => p.x));
+      let maxX = Math.max(...scaledBuildingPoints.map(p => p.x));
+      let step = 3;
+
+      for (let x = minX; x <= maxX; x += step) {
+        let inter = map(x, minX, maxX, 0, 1);
+        let building2StrokeColors;
+        if (inter < 0.5) {
+          building2StrokeColors = lerpColor(building2Colors[0], building2Colors[1] , inter * 2);
+        } else {
+          building2StrokeColors = lerpColor(building2Colors[1], building2Colors[2], (inter - 0.5) * 2);
+        }
+        fillShapeWithVerticalLines(scaledBuildingPoints, building2StrokeColors, x);
+      }
+    }
+
   
 // 5. FILL SHAPES WITH LINES
   // We then find the bounding box of our shapes and draw parallel lines within
@@ -243,6 +407,34 @@ function draw() {
         stroke(color);
         strokeWeight(2);
         line(intersections[i], y, intersections[i + 1], y);
+      }
+    }
+  }
+
+  function fillShapeWithVerticalLines(points, color, x) {
+    let minY = Infinity, maxY = -Infinity;
+
+    for (let p of points) {
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    }
+
+    let intersections = [];
+    for (let i = 0; i < points.length; i++) {
+      let p1 = points[i];
+      let p2 = points[(i + 1) % points.length];
+      if ((p1.x < x && p2.x >= x) || (p2.x < x && p1.x >= x)) {
+        let y = p1.y + (x - p1.x) * (p2.y - p1.y) / (p2.x - p1.x);
+        intersections.push(y);
+      }
+    }
+    intersections.sort((a, b) => a - b);
+
+    for (let i = 0; i < intersections.length; i += 2) {
+      if (i + 1 < intersections.length) {
+        stroke(color);
+        strokeWeight(2);
+        line(x, intersections[i], x, intersections[i + 1]);
       }
     }
   }
