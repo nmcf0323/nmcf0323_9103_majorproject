@@ -23,6 +23,13 @@
         color("#81b6ac"), 
         color("#3459a0")  
       ];
+      skyColors2 = [
+        color("cce3ff"),
+        color("#93c4ff"), 
+        color("#61a8ff"),
+        color("#488de4"),
+        color("#3459a0")  
+      ];
 
   // 2B. SHAPE DEFINITIONS
     // We then define the coordinates that outline each section in the artwork so that these created shapes can be filled with lines
@@ -80,60 +87,52 @@ function draw() {
   drawSky();
 }
   // We first draw the sky. This requires it's own scaling and coloring methods due to the complexity of the diagonal lines
-    function drawSky() {
-      let scaleX = width / originalWidth;
-      let scaleY = height / originalHeight;
-
-      skyAngles.forEach(shape => {
-        noStroke();
-        beginShape();
-        for (let pt of shape.points) {
-          vertex(pt.x * scaleX, pt.y * scaleY);
-        }
-        endShape(CLOSE);
-        
-        fillShapeWithDiagonalLines(shape.points, shape.angle, scaleX, scaleY);
-      });
-    }
-
-  // We then draw the river, buildings, and building reflection, applying scaling 
-  // and using lerpColor + array indexing to implement a gradual color gradient based on the line's position on the canvas
-    function drawRiver() {
-      let scaledRiverPoints = scalePoints(riverPoints);
-
-      let minY = Math.min(...scaledRiverPoints.map(p => p.y));
-      let maxY = Math.max(...scaledRiverPoints.map(p => p.y));
-      let step = 4;
-
-      for (let y = minY; y <= maxY; y += step) {
-        let inter = map(y, minY, maxY, 0, 1);
-        let riverStrokeColor;
-        if (inter < 0.5) {
-          riverStrokeColor = lerpColor(skyColors[0], skyColors[2], inter * 2);
-        } else {
-          riverStrokeColor = lerpColor(skyColors[2], skyColors[4], (inter - 0.5) * 2);
-        }
-        fillShapeWithHorizontalLines(scaledRiverPoints, riverStrokeColor, y);
+  function drawSky() {
+    let scaleX = width / originalWidth;
+    let scaleY = height / originalHeight;
+ 
+    // I then use the p5.js system variable mouseX to track the mouse's x-position
+    // I normalise the mouse position to a range between 0 and 1 based on the browser width by dividing mouseX by width
+    let mouseXRatio = mouseX / width;
+    
+    // I then loop through each shape and initialise an empty array to store the changing sky color
+    for (let i = 0; i < skyAngles.length; i++) {
+      let shape = skyAngles[i];
+      let changingSkyColor = [];
+      
+    // I then loop through the color arrays and use lerpColor to interpolate between these arrays based on the mouse's x-position
+    // This means that as the mouse moves along the x-axis, skyColor[0] will transition to skyColor2[0], skyColor[1] will transition to skyColor2[1] and so on
+    // I then push the interpolated colors into the previously initialised changing sky color array to be called upon when filling the sky shapes with lines
+      for (let j = 0; j < skyColors.length; j++) {
+        let interpolatedColor = lerpColor(skyColors[j], skyColors2[j], mouseXRatio);
+        changingSkyColor.push(interpolatedColor);
       }
+      
+      noStroke();
+      beginShape();
+      for (let pt of shape.points) {
+        vertex(pt.x * scaleX, pt.y * scaleY);
+      }
+      endShape(CLOSE);
+    
+     // I add the currentSkyColor array to the fillShapeWithDiagonalLines function
+      fillShapeWithDiagonalLines(shape.points, shape.angle, scaleX, scaleY, changingSkyColor);
     }
-
-
-
+  }
+  
 // 5. FILL SHAPES WITH LINES
   // We then find the bounding box of our shapes and draw parallel lines within
   // Starting with the sky, this requires using the rotated points to find these bounds 
-  function fillShapeWithDiagonalLines(points, angle, scaleX, scaleY) {
+  function fillShapeWithDiagonalLines(points, angle, scaleX, scaleY, changingSkyColor) {
     let rotatedPoints = points.map(p => rotatePoint({ x: p.x * scaleX, y: p.y * scaleY}, angle));
     let minY = Infinity, maxY = -Infinity;
-  
+    
     for (let p of rotatedPoints) {
       if (p.y < minY) minY = p.y;
       if (p.y > maxY) maxY = p.y;
     }
     let step = 5;
-
-  // We then iterate through each pair of consecutive rotated points to detect any intersections at the current y-coordinate
-  // and sort them by ascending x-coordinates
+  
     for (let y = minY; y <= maxY; y += step) {
       let intersections = [];
       for (let i = 0; i < rotatedPoints.length; i++) {
@@ -152,17 +151,17 @@ function draw() {
           let pt1 = rotatePoint({ x: x1, y: y }, -angle);
           let pt2 = rotatePoint({ x: x2, y: y }, -angle);
   
-    // We then use lerpColor and array indexing to interpolate between sky colors based on vertical position
+          // I have replaced the originial color array with the changing sky color array
           let t = map(y, minY, maxY, 0, 1);
           let skyStrokeColor;
           if (t < 0.25) {
-            skyStrokeColor = lerpColor(skyColors[4], skyColors[3], t * 4); 
+            skyStrokeColor = lerpColor(changingSkyColor[4], changingSkyColor[3], t * 4); 
           } else if (t < 0.5) {
-            skyStrokeColor = lerpColor(skyColors[3], skyColors[2], (t - 0.25) * 4);
+            skyStrokeColor = lerpColor(changingSkyColor[3], changingSkyColor[2], (t - 0.25) * 4);
           } else if (t < 0.75) {
-            skyStrokeColor = lerpColor(skyColors[2], skyColors[1], (t - 0.5) * 4);
+            skyStrokeColor = lerpColor(changingSkyColor[2], changingSkyColor[1], (t - 0.5) * 4);
           } else {
-            skyStrokeColor = lerpColor(skyColors[1], skyColors[0], (t - 0.75) * 4);
+            skyStrokeColor = lerpColor(changingSkyColor[1], changingSkyColor[0], (t - 0.75) * 4);
           }
           stroke(skyStrokeColor);
           line(pt1.x, pt1.y, pt2.x, pt2.y);
